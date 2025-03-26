@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install arm-none-eabi-gcc
+      uses: carlosperate/arm-none-eabi-gcc-action@v1
+      with:
+        release: '14.2.Rel1'
+
+    - name: Cache APT packages
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: >
+          ninja-build
+          meson
+        version: 1
+
+    - name: Install dependencies
+      run: |
+          sudo apt update
+          sudo apt install -y ninja-build meson
+
+    - name: Setup
+      run: meson setup build --cross-file toolchain/stm32f7.txt --buildtype=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: meson compile -C build
+

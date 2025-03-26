@@ -1,0 +1,43 @@
+/**
+ * mutex
+ * Created on: 03/03/2025
+ * Author mateuszpiesta
+ * Company: mprogramming
+ */
+
+#pragma once
+
+#include <type_traits>
+#include <array>
+#include <cstdint>
+#include <cstddef>
+
+namespace std {
+
+    template<bool recursive>
+    class mutex_helper {
+    public:
+
+        mutex_helper() noexcept;
+        ~mutex_helper();
+
+        mutex_helper(const mutex_helper&) = delete;
+        mutex_helper& operator=(const mutex_helper&) = delete;
+
+        using native_handle_type = void*;
+        void               lock();
+        void               unlock();
+        bool               try_lock();
+        native_handle_type native_handle();
+
+    private:
+        alignas(sizeof(std::uint32_t)) std::array<std::byte, 80> storage{};
+        native_handle_type handle{};
+    };
+
+    using recursive_mutex = mutex_helper<true>;
+    using mutex = mutex_helper<false>;
+
+} // namespace std
+
+#include_next <mutex>

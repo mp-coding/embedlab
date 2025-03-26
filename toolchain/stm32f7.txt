@@ -1,0 +1,26 @@
+[binaries]
+c = 'arm-none-eabi-gcc'
+cpp = 'arm-none-eabi-g++'
+ld = 'arm-none-eabi-ld'
+ar = 'arm-none-eabi-ar'
+as = 'arm-none-eabi-as'
+strip = 'arm-none-eabi-strip'
+nm = 'arm-none-eabi-nm'
+objcopy = 'arm-none-eabi-objcopy'
+objdump = 'arm-none-eabi-objdump'
+size = 'arm-none-eabi-size'
+
+[built-in options]
+c_args = ['-mcpu=cortex-m7', '-mthumb', '-mfpu=fpv5-sp-d16', '-mfloat-abi=hard', '--specs=nosys.specs','--specs=nano.specs', '-u _printf_float']
+cpp_args = c_args
+c_link_args = ['-mcpu=cortex-m7', '-mthumb', '-mfpu=fpv5-sp-d16', '-mfloat-abi=hard', '-Wl,--print-memory-usage','-Wl,-Map=%', '--specs=nosys.specs', '--specs=nano.specs', '-u _printf_float']
+cpp_link_args = c_link_args
+
+[properties]
+needs_exe_wrapper = true
+
+[host_machine]
+system = 'bare-metal'
+cpu_family = 'arm'
+cpu = 'cortex-m7'
+endian = 'little'
