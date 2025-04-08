@@ -1,11 +1,14 @@
+#include "board/board.hpp"
+#include "board/sdcard_blockdev.hpp"
+#include "board/stdout.hpp"
 
-#include "board.hpp"
 #include "vfs/disk.hpp"
 #include "vfs/stdstream.hpp"
+#include <vfs/disk_mngr.hpp>
+#include <vfs/vfs.hpp>
+#include <vfs/logger.hpp>
 
 extern "C" {
-#include "main.h"
-
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -14,18 +17,10 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "sdcard_blockdev.hpp"
-#include "stdout.hpp"
-
-#include <vfs/disk_mngr.hpp>
-#include <vfs/vfs.hpp>
-#include <vfs/logger.hpp>
-
 #include <filesystem>
 #include <cassert>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <dirent.h>
 #include <unistd.h>
 #include <cinttypes>
 
@@ -37,18 +32,16 @@ namespace {
         ~DefaultStdStream() override { syscalls::stdout_deinit(); }
         vfs::result<std::size_t> in(std::span<char>) override
         {
-            // TODO
+            /// TODO: Not currently supported
             return vfs::error(ENOTSUP);
         }
         vfs::result<std::size_t> out(std::span<const char> data) override
         {
-            /// TODO: refactor stdout_write
             if (not syscalls::stdout_write(data)) { return data.size(); }
             return vfs::error(EIO);
         }
         vfs::result<std::size_t> err(std::span<const char> data) override
         {
-            /// TODO: refactor stdout_write
             if (not syscalls::stdout_write(data)) { return data.size(); }
             return vfs::error(EIO);
         }
@@ -62,7 +55,7 @@ namespace vfs {
 
 [[noreturn]] void main_task(void*)
 {
-    vfs::logger::register_output_callback([](const auto lvl, const auto data) { printf("<%s> %s\r\n", vfs::logger::internal::level2str(lvl), data); });
+    vfs::logger::register_output_callback([](const auto lvl, const auto data) { printf("<%s> %s\n", vfs::logger::internal::level2str(lvl), data); });
 
     auto blockdev  = SDCardBlockdev();
     auto disk_mngr = vfs::DiskManager();
@@ -84,25 +77,25 @@ namespace vfs {
 
     const auto lua_entry_point = "/mnt/vol0/main.lua";
     if (luaL_dofile(lua_state, lua_entry_point) != LUA_OK) {
-        printf("Error running Lua main entry point: %s\r\n", lua_tostring(lua_state, -1));
+        printf("Error running Lua main entry point: %s\n", lua_tostring(lua_state, -1));
         lua_pop(lua_state, 1);
     }
 
     lua_close(lua_state);
 
-    umount("/mnt/vol0");
+    assert(umount("/mnt/vol0") == 0);
 
-    uint32_t counter {};
+    std::uint32_t counter {};
     while (true) {
-        BSP_LED_Toggle(LED1);
-        printf("Led blink: %" PRIu32 "\r\n", counter++);
+        board::user_led_toggle();
+        printf("Led blink: %" PRIu32 "\n", counter++);
         vTaskDelay(1000);
     }
 }
 int main()
 {
     assert(board::init().value() == 0);
-    xTaskCreate(main_task, "main", 1024*8, nullptr, tskIDLE_PRIORITY, nullptr);
+    xTaskCreate(main_task, "main", 1024 * 8, nullptr, tskIDLE_PRIORITY, nullptr);
 
     vTaskStartScheduler();
 }

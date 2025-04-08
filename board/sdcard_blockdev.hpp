@@ -8,8 +8,9 @@
 #pragma once
 
 #include <vfs/blockdev.hpp>
+#include <memory>
 
-#include "stm32746g_discovery_sd.h"
+struct HAL_SD_CardInfo;
 
 class SDCardBlockdev : public vfs::BlockDevice {
 public:
@@ -24,5 +25,5 @@ public:
     [[nodiscard]] std::string              get_name() const override;
 
 private:
-    HAL_SD_CardInfoTypeDef info {};
+    std::unique_ptr<HAL_SD_CardInfo> info {};
 };

@@ -5,7 +5,7 @@
  * Company: mprogramming
  */
 
-#include "stdlib/mutex"
+#include "../stdlib/mutex"
 
 #include <FreeRTOS.h>
 #include <semphr.h>

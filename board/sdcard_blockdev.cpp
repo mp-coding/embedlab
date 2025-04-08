@@ -8,6 +8,7 @@
 #include "sdcard_blockdev.hpp"
 
 #include "stm32746g_discovery.h"
+#include "stm32746g_discovery_sd.h"
 
 extern "C" {
 
@@ -30,7 +31,7 @@ SDCardBlockdev::~SDCardBlockdev() { BSP_SD_DeInit(); }
 
 std::error_code SDCardBlockdev::probe()
 {
-    BSP_SD_GetCardInfo(&info);
+    BSP_SD_GetCardInfo(info.get());
 
     if (BSP_SD_GetCardState() == SD_TRANSFER_OK) { return {}; }
 
@@ -48,6 +49,6 @@ std::error_code SDCardBlockdev::read(std::byte& buf, sector_t lba, std::size_t c
     while (BSP_SD_GetCardState() != SD_TRANSFER_OK) { }
     return BSP_SD_ReadBlocks(reinterpret_cast<std::uint32_t*>(&buf), lba, count, 500) == MSD_OK ? std::error_code {} : vfs::from_errno(EIO);
 }
-vfs::result<std::size_t>                SDCardBlockdev::get_sector_size() const { return info.BlockSize; }
-vfs::result<vfs::BlockDevice::sector_t> SDCardBlockdev::get_sector_count() const { return info.BlockNbr; }
+vfs::result<std::size_t>                SDCardBlockdev::get_sector_size() const { return info->BlockSize; }
+vfs::result<vfs::BlockDevice::sector_t> SDCardBlockdev::get_sector_count() const { return info->BlockNbr; }
 std::string                             SDCardBlockdev::get_name() const { return "sdcard0"; }

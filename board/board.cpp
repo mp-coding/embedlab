@@ -181,4 +181,6 @@ namespace board {
         return syscalls::stdout_init();
     }
     std::error_code deinit() { return {}; }
+
+    void user_led_toggle() { BSP_LED_Toggle(LED1); }
 } // namespace board

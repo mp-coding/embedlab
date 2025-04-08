@@ -88,7 +88,7 @@ typedef uint32_t HAL_SD_CardStateTypeDef;
 /** 
   * @brief  SD Card Information Structure definition
   */ 
-typedef struct
+typedef struct HAL_SD_CardInfo
 {
   uint32_t CardType;                     /*!< Specifies the card Type                         */
   

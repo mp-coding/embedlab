@@ -12,4 +12,6 @@
 namespace board {
     std::error_code init();
     std::error_code deinit();
+
+    void user_led_toggle();
 } // namespace board

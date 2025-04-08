@@ -17,14 +17,27 @@ cd embedlab
 ```
 ### Building the Project
 ```sh
-meson setup build --cross-file toolchain/stm32f7.txt
+meson setup build --cross-file toolchain/stm32f7.txt --optimization=g
 ninja -C build
 ```
 
 ### Flashing to the STM32F7 Discovery Board
 ```sh
-openocd -f interface/stlink-v2-1.cfg -f target/stm32f7x.cfg -c "program build/embedlab.elf verify reset exit"
+meson compile -C build program
 ```
+
+### Printing detailed size report
+```sh
+meson compile -C build size
+```
+
+### Creating read-to-use SD image
+```sh
+./scripts/prepare_sdcard.sh <dev>    
+```
+Important: This script will wipe out all the data from the disk. Please check that:
+1. You passed the correct block device
+2. You backed up all the important data from SD card
 
 ## Contributing
 

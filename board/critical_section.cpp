@@ -5,7 +5,7 @@
  * Company: mprogramming
  */
 
-#include "osal/critical_section.hpp"
+#include "../osal/critical_section.hpp"
 
 #include <FreeRTOS.h>
 

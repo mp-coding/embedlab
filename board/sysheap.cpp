@@ -5,12 +5,12 @@
  * Company: mprogramming
  */
 
-#include "sysheap.hpp"
+#include "../sysheap.hpp"
 
 #include "tlsf.h"
 #include "FreeRTOS.h"
 
-#include <osal/critical_section.hpp>
+#include <../osal/critical_section.hpp>
 
 #include <cstdint>
 #include <cassert>
