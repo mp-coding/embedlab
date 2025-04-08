@@ -32,7 +32,8 @@ jobs:
     - name: Install dependencies
       run: |
           sudo apt update
-          sudo apt install -y ninja-build meson
+          sudo apt install -y ninja-build meson openocd
+          pip install -r requirements.txt
 
     - name: Setup
       run: meson setup build --cross-file toolchain/stm32f7.txt --buildtype=${{env.BUILD_TYPE}}
